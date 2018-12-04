@@ -27,7 +27,7 @@ struct Node
 
     std::vector<Node*> nodes;
 
-    
+
     // if left, side == true
     // if right, side == false
     bool side = false;
