@@ -1,6 +1,6 @@
 #ifndef MY_DIFFERENTIATOR_MY_DIFFERENTIATOR_H
 #define MY_DIFFERENTIATOR_MY_DIFFERENTIATOR_H
-
+#include <vector>
 #include "stdio.h"
 #include "string.h"
 
@@ -15,7 +15,8 @@ enum TYPE
 
 enum Operations
 {
-    add = '+', sub = '-', mul = '*', div = '/'
+    add = '+', sub = '-', mul = '*', div = '/',
+    sin = 's', cos = 'c', pow = '^',
 };
 
 struct Node
@@ -24,6 +25,9 @@ struct Node
     Node* right = nullptr;
     Node* parent = nullptr;
 
+    std::vector<Node*> nodes;
+
+    
     // if left, side == true
     // if right, side == false
     bool side = false;
@@ -36,6 +40,8 @@ class Tree
 {
 
 public:
+
+
     Node* root = nullptr;
     size_t size = 0;
 
@@ -56,10 +62,6 @@ public:
     int Write_DOT(FILE* out);
 
     ~Tree();
-
-
-
-
 };
 
 int Simplify(Node* node);
@@ -71,6 +73,29 @@ Node* CreateNode(TYPE type, double value, Node* left, Node* right);
 bool is_leaf(Node* ptr);
 
 int Dotwrite_elems(Node* elem, int* num, FILE* out);
+
+class Rec_descent
+{
+    char* begin = nullptr;
+    char* ptr = nullptr;
+    int size = 0;
+
+    Node* root = nullptr;
+
+    Node* get_E();
+    Node* get_T();
+    Node* get_Deg();
+    Node* get_Trigo();
+    Node* get_P();
+    double get_N();
+    int skip_space();
+
+public:
+
+    Node* get_G(char* buf);
+
+};
+
 
 }
 
