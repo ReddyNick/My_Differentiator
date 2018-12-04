@@ -25,9 +25,6 @@ struct Node
     Node* right = nullptr;
     Node* parent = nullptr;
 
-    std::vector<Node*> nodes;
-
-
     // if left, side == true
     // if right, side == false
     bool side = false;
@@ -40,7 +37,6 @@ class Tree
 {
 
 public:
-
 
     Node* root = nullptr;
     size_t size = 0;

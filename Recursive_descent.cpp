@@ -1,5 +1,6 @@
 #include "My_Differentiator.h"
 #include "assert.h"
+#include <iostream>
 namespace My_Diff
 {
 
@@ -19,13 +20,13 @@ Node* Rec_descent::get_G(char* buf)
 Node* Rec_descent::get_E()
 {
     skip_space();
-    Node* node = new Node;
+
+    Node* node = get_T();
 
     while (*ptr == '+' || *ptr == '-')
     {
         char op = *ptr;
         ptr++; skip_space();
-
 
         if (op == '+')
         {
@@ -38,8 +39,7 @@ Node* Rec_descent::get_E()
             node = CreateNode(OP, sub, node, node2);
         }
     }
-
-    return node;
+        return node;
 }
 
 Node* Rec_descent::get_T()

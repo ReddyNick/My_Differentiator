@@ -22,19 +22,19 @@ int main()
 
     tree.Read(input);
 
-//    My_Diff::Tree derivation;
-//
-//
-    //derivation.root = tree.diff(tree.root);
-    //My_Diff::Simplify(derivation.root);
+    My_Diff::Tree derivation;
+
+
+    derivation.root = tree.diff(tree.root);
+    My_Diff::Simplify(derivation.root);
 
 //    derivation.Write_tree(res);
 
 
     FILE* dot = fopen("dot/tree.gv","w");
 
-    tree.Write_DOT(dot);
-    //derivation.Write_DOT(dot);
+//    tree.Write_DOT(dot);
+    derivation.Write_DOT(dot);
 
     fclose(dot);
 

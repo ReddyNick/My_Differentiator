@@ -1,7 +1,7 @@
 #include "My_Differentiator.h"
 #include "assert.h"
 #include "ctype.h"
-
+#include <iostream>
 int erno = 0;
 
 namespace My_Diff
@@ -46,9 +46,7 @@ int Tree::Read(FILE* input)
 
     Rec_descent tree;
 
-    root = tree.get_G(buf, &(this->nodes));
-
-    //root = Make_tree(ptr);
+    root = tree.get_G(buf);
 
     delete[] buf;
 
