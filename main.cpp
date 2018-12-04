@@ -18,23 +18,26 @@ int main()
     My_Diff::Tree tree;
 
     FILE* input = fopen("Polynomial.txt", "r");
-    FILE* res = fopen("result.txt", "w");
+    FILE* res = fopen("LaTex/deriv.tex", "w");
+
+    assert(input != NULL);
+    assert(res != NULL);
 
     tree.Read(input);
 
     My_Diff::Tree derivation;
-
-
     derivation.root = tree.diff(tree.root);
     My_Diff::Simplify(derivation.root);
 
 //    derivation.Write_tree(res);
+//    tree.Write_tree(res);
 
+    My_Diff::LaTex(res, tree.root, derivation.root);
 
     FILE* dot = fopen("dot/tree.gv","w");
 
-//    tree.Write_DOT(dot);
-    derivation.Write_DOT(dot);
+    tree.Write_DOT(dot);
+//    derivation.Write_DOT(dot);
 
     fclose(dot);
 

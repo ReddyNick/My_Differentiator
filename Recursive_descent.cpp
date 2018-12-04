@@ -89,11 +89,10 @@ Node *Rec_descent::get_Trigo()
 {
     skip_space();
 
-    char trig[3] = "";
+    char trig[4] = "";
 
     for (int i = 0; i < 3 && *(ptr + i) != '\0'; i++)
         trig[i] = *(ptr + i);
-
 
     Node* node = nullptr;
     if (strcmp(trig, "sin") == 0)
@@ -107,7 +106,7 @@ Node *Rec_descent::get_Trigo()
       assert(*ptr == ')');
       ptr++; skip_space();
 
-      node = CreateNode(OP, 's', node, nullptr);
+      node = CreateNode(OP, 's', nullptr, node);
     }
     else
     if (strcmp(trig, "cos") == 0)
@@ -121,7 +120,7 @@ Node *Rec_descent::get_Trigo()
         assert(*ptr == ')');
         ptr++; skip_space();
 
-        node = CreateNode(OP, 'c', node, nullptr);
+        node = CreateNode(OP, 'c', nullptr, node);
     }
     else
         node = get_P();

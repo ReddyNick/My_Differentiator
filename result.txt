@@ -1,0 +1,12 @@
+\documentclass[12pt,a4paper]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{indentfirst}
+\usepackage{misccorr}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\begin{document}
+$$
+2\cdot (x^3+2)+\frac{sin(x^3)-7\cdot x+23}{x-cos(x)^2}-3\cdot sin(x+\frac{1}{2})+4\cdot sin(4\cdot x)
+$$
+\end{document}

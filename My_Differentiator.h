@@ -8,6 +8,12 @@ const int STR_MAXSIZE = 20;
 namespace My_Diff
 {
 
+enum Priorities
+{
+    p_add = 0, p_sub = p_add, p_mul = 1, p_div = p_mul,
+    p_pow = 2, p_sin = 3, p_cos = p_sin,
+};
+
 enum TYPE
 {
     OP = 0, VAR, CONST, Other
@@ -38,6 +44,7 @@ class Tree
 
 public:
 
+
     Node* root = nullptr;
     size_t size = 0;
 
@@ -46,12 +53,10 @@ public:
     Node* Make_tree(char*& ptr);
 
     // infix write without any brackets
-    int Write_tree_rec(Node* root, FILE* out);
 
-    int Write_tree(FILE *out)
-    {
-        return Write_tree_rec(root, out);
-    }
+
+    int Write_tree(FILE *out);
+
 
     Node* diff(Node* node);
 
@@ -59,6 +64,10 @@ public:
 
     ~Tree();
 };
+
+int LaTex(FILE* out, Node* node1, Node* node2);
+
+int Write_tree_rec(Node* root, int prev, FILE* out);
 
 int Simplify(Node* node);
 

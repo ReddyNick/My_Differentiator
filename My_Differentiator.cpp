@@ -2,31 +2,164 @@
 #include "assert.h"
 #include "ctype.h"
 #include <iostream>
+#include "math.h"
 int erno = 0;
 
 namespace My_Diff
 {
+//from lower priority down to higher - no brackets
+//from higher down to lower - brackets.
 
-int Tree::Write_tree_rec(Node *node, FILE* out)
+int get_priority(Node* node)
+{
+    switch((int)node->value)
+    {
+        case add:
+            return p_add;
+        case sub:
+            return p_sub;
+        case mul:
+            return p_mul;
+        case div:
+            return p_div;
+        case pow:
+            return p_pow;
+        case sin:
+            return p_sin;
+        case cos:
+            return p_cos;
+        default:
+            printf("wrong priority!\n");
+            abort();
+    }
+}
+
+int LaTex(FILE *out, Node* node1, Node* node2)
+{
+
+    fprintf(out, "\\documentclass[12pt,a4paper]{scrartcl}\n"
+                 "\\usepackage[utf8]{inputenc}\n"
+                 "\\usepackage[english,russian]{babel}\n"
+                 "\\usepackage{indentfirst}\n"
+                 "\\usepackage{misccorr}\n"
+                 "\\usepackage{graphicx}\n"
+                 "\\usepackage{amsmath}\n"
+                 "\\begin{document}\n");
+
+    fprintf(out, "Найдем производную \n\n $f(x) = ");
+
+    Write_tree_rec(node1, 0, out); fprintf(out, "$\n\n");
+
+    fprintf(out,"элементарно и ачевидно, что\n\n $\\frac{df(x)}{dx} = ");
+
+    Write_tree_rec(node2, 0, out); fprintf(out, "$\n\n");
+
+    fprintf(out, "\n\n"
+                 "\\end{document}");
+
+    return 0;
+}
+
+    int Tree::Write_tree(FILE *out)
+{
+    fprintf(out, "\\documentclass[12pt,a4paper]{scrartcl}\n"
+                 "\\usepackage[utf8]{inputenc}\n"
+                 "\\usepackage[english,russian]{babel}\n"
+                 "\\usepackage{indentfirst}\n"
+                 "\\usepackage{misccorr}\n"
+                 "\\usepackage{graphicx}\n"
+                 "\\usepackage{amsmath}\n"
+                 "\\begin{document}\n"
+                 "$$\n");
+
+
+    Write_tree_rec(root, 0, out);
+
+    fprintf(out, "\n$$\n"
+                 "\\end{document}");
+
+    return 0;
+}
+
+int Write_tree_rec(Node *node, int prev_proir, FILE* out)
 {
     // assert out of function
     assert(out != NULL);
 
     if (node == nullptr) return 0;
 
-    Tree::Write_tree_rec(node->left, out);
-
-    if (node->type == OP)
-        fprintf(out, "%c", (char)node->value);
-
+    if (node->type != OP)
+    {
+        if(node->type == CONST)
+            fprintf(out, "%lg", node->value);
+        else
+            fprintf(out, "%c", (char)node->value);
+    }
     else
-    if(node->type == CONST)
-        fprintf(out, "%lg", node->value);
+    {
+        int prior = get_priority(node);
 
-    else
-        fprintf(out, "%c", (char)node->value);
+        if (prev_proir > prior)
+            fprintf(out, "(");
 
-    Tree::Write_tree_rec(node->right, out);
+
+        if ((int)node->value == '/')
+        {
+            fprintf(out, "\\frac{");
+            prior = 0;
+
+            Write_tree_rec(node->left, prior, out);
+
+            fprintf(out, "}{");
+
+            Write_tree_rec(node->right, prior, out);
+
+            fprintf(out, "}");
+        }
+        else
+        {
+            Write_tree_rec(node->left, prior, out);
+
+            switch ((int) node->value)
+            {
+                case mul:
+                    fprintf(out, "\\cdot ");
+                    break;
+                case sin:
+                    fprintf(out, "sin");
+
+                    fprintf(out, "(");
+                    Write_tree_rec(node->right, 0, out);
+                    fprintf(out, ")");
+
+                    return 0;
+
+                case cos:
+                    fprintf(out, "cos");
+
+                    fprintf(out, "(");
+                    Write_tree_rec(node->right, 0, out);
+                    fprintf(out, ")");
+
+                    return 0;
+
+                case add:
+                case sub:
+                case pow:
+                    fprintf(out,"%c",(char)node->value);
+                    break;
+
+                default:
+                    fprintf(out, "error writing!\n");
+                    assert(0);
+            }
+
+            Write_tree_rec(node->right, prior, out);
+        }
+
+        if (prev_proir > prior)
+            fprintf(out, ")");
+    }
 
     return 0;
 }
@@ -99,9 +232,9 @@ Node* Tree::diff(Node *node)
 
 #define  POW(a, b) CreateNode(OP, pow, a, b)
 
-#define  COS CreateNode(OP, cos, L, nullptr)
+#define  COS CreateNode(OP, cos, nullptr, R)
 
-#define  SIN CreateNode(OP, sin, L, nullptr)
+#define  SIN CreateNode(OP, sin, nullptr, R)
 
     switch (node->type)
     {
@@ -127,14 +260,14 @@ Node* Tree::diff(Node *node)
                     return DIV(SUB(MUL(dL, R), MUL(L, dR)), MUL(R, R));
 
                 case sin:
-                    return MUL(COS, dL);
+                    return MUL(COS, dR);
 
                 case cos:
                 {
                     Node* minus_one = new Node;
                     minus_one->type = CONST;
                     minus_one->value = -1;
-                    return MUL((SIN, dL), minus_one);
+                    return MUL(MUL(SIN, dR), minus_one);
                 }
 
                 case pow:
@@ -270,10 +403,69 @@ bool Check(Node* node, int num,  bool* Left)
      return 0;
 }
 
-int ConstS(Node* node, double num)
+int ConstS(Node* node, Operations oper)
 {
     assert(node != nullptr);
 
+    if (node->left->type == CONST && node->right->type == CONST)
+    {
+
+        double num = 0;
+        switch (oper)
+        {
+            case mul:
+                num = node->left->value * node->right->value;
+                break;
+            case add:
+                num = node->left->value + node->right->value;
+                break;
+            case sub:
+                num = node->left->value - node->right->value;
+                break;
+            case div:
+                num = node->left->value / node->right->value;
+                break;
+        }
+
+        node->type = CONST;
+        node->value = num;
+
+        Delete_rec(node->right);
+        Delete_rec(node->left);
+
+        node->left = node->right = nullptr;
+
+        return 1;
+    }
+
+    return 0;
+}
+int Add_zero_mul_one(Node* node, int num)
+{
+    bool Left = false;
+
+    if (Check(node, num, &Left))
+    {
+        if (Left)
+        {
+            delete[] node->left;
+            Instead(node, node->right);
+        }
+        else
+        {
+            delete[] node->right;
+            Instead(node, node->left);
+        }
+
+        return 1;
+    }
+
+    return 0;
+}
+
+int mul_div_zero(Node* node)
+{
+    int num = 0;
     node->type = CONST;
     node->value = num;
 
@@ -285,71 +477,6 @@ int ConstS(Node* node, double num)
     return 0;
 }
 
-int simple_mul(Node* node)
-{
-    bool Left = false;
-
-    if (node->left->type == CONST && node->right->type == CONST)
-    {
-        double num = node->left->value * node->right->value;
-        ConstS(node, num);
-
-        return 0;
-    }
-
-    if (Check(node, 0, &Left))
-    {
-        ConstS(node, 0);
-        return 0;
-    }
-
-    if (Check(node, 1, &Left))
-    {
-        if (Left)
-        {
-            delete[] node->left;
-            Instead(node, node->right);
-        }
-        else
-        {
-            delete[] node->right;
-            Instead(node, node->left);
-        }
-    }
-
-    return 0;
-}
-
-int simple_add(Node* node)
-{
-    bool Left = false;
-
-    if (node->left->type == CONST && node->right->type == CONST)
-    {
-        double num = node->left->value + node->right->value;
-        ConstS(node, num);
-
-        return 0;
-    }
-
-    if (Check(node, 0, &Left))
-    {
-        if (Left)
-        {
-            delete[] node->left;
-            Instead(node, node->right);
-        }
-        else
-        {
-            delete[] node->right;
-            Instead(node, node->left);
-        }
-
-        return 0;
-    }
-
-    return 0;
-}
 
 int Simplify(Node* node)
 {
@@ -361,13 +488,49 @@ int Simplify(Node* node)
 
     switch((int)node->value)
     {
-        case '*':
-            if (simple_mul(node)) return 0;
+        case mul:
+            if (ConstS(node, mul));
+
+            else
+            if (Add_zero_mul_one(node, 1));
+
+            else
+            {
+                bool Left = false;
+
+                if (Check(node, 0, &Left))
+                    mul_div_zero(node);
+            }
             break;
 
-        case '+':
-            if (simple_add(node)) return 0;
+        case add:
+            if (ConstS(node, add));
+            else
+                Add_zero_mul_one(node, 0);
             break;
+
+        case sub:
+            if (ConstS(node, sub));
+
+            else
+            if (node->right->type == CONST && node->right->value == 0)
+            {
+                delete[] node->right;
+                Instead(node, node->left);
+            }
+            break;
+
+        case div:
+        {
+            bool Left = false;
+
+            if (ConstS(node, div));
+
+            else
+            if (Check(node,0, &Left) && Left)
+                mul_div_zero(node);
+        }
+        break;
     }
 
     return 0;
