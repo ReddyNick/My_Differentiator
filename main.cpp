@@ -29,20 +29,13 @@ int main()
     derivation.root = tree.diff(tree.root);
     My_Diff::Simplify(derivation.root);
 
-//    derivation.Write_tree(res);
-//    tree.Write_tree(res);
-
     My_Diff::LaTex(res, tree.root, derivation.root);
 
-    FILE* dot = fopen("dot/tree.gv","w");
+    FILE* dot = fopen("dot/tree.gv", "w");
 
     tree.Write_DOT(dot);
-//    derivation.Write_DOT(dot);
 
     fclose(dot);
-
-
-
     fclose(res);
     fclose(input);
     return 0;

@@ -65,7 +65,7 @@ public:
     ~Tree();
 };
 
-int LaTex(FILE* out, Node* node1, Node* node2);
+int LaTex(FILE* out, Node* node1, Node* node2d);
 
 int Write_tree_rec(Node* root, int prev, FILE* out);
 

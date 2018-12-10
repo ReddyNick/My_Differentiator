@@ -30,7 +30,7 @@ int get_priority(Node* node)
             return p_cos;
         default:
             printf("wrong priority!\n");
-            abort();
+            return -1;
     }
 }
 
@@ -46,13 +46,13 @@ int LaTex(FILE *out, Node* node1, Node* node2)
                  "\\usepackage{amsmath}\n"
                  "\\begin{document}\n");
 
-    fprintf(out, "Найдем производную \n\n $f(x) = ");
+    fprintf(out, "Найдем производную \\vspace{0.5cm}\n\n$f(x) = ");
 
-    Write_tree_rec(node1, 0, out); fprintf(out, "$\n\n");
+    Write_tree_rec(node1, 0, out); fprintf(out, "$\\vspace{0.5cm}\n\n");
 
-    fprintf(out,"элементарно и ачевидно, что\n\n $\\frac{df(x)}{dx} = ");
+    fprintf(out,"элементарно и ачевидно, что\\vspace{0.5cm}\n\n $\\frac{df(x)}{dx} = ");
 
-    Write_tree_rec(node2, 0, out); fprintf(out, "$\n\n");
+    Write_tree_rec(node2, 0, out); fprintf(out, "$");
 
     fprintf(out, "\n\n"
                  "\\end{document}");
@@ -60,7 +60,7 @@ int LaTex(FILE *out, Node* node1, Node* node2)
     return 0;
 }
 
-    int Tree::Write_tree(FILE *out)
+int Tree::Write_tree(FILE *out)
 {
     fprintf(out, "\\documentclass[12pt,a4paper]{scrartcl}\n"
                  "\\usepackage[utf8]{inputenc}\n"
@@ -146,7 +146,7 @@ int Write_tree_rec(Node *node, int prev_proir, FILE* out)
                 case add:
                 case sub:
                 case pow:
-                    fprintf(out,"%c",(char)node->value);
+                    fprintf(out,"%c", (char)node->value);
                     break;
 
                 default:
@@ -279,7 +279,7 @@ Node* Tree::diff(Node *node)
                 }
 
                 default:
-                    erno = 2;
+
                     return nullptr;
             }
 
